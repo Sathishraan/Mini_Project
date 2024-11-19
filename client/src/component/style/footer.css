@@ -1,0 +1,193 @@
+/* Footer.css */
+.footer {
+    background-color: #2a582a;
+    color: #fff;
+    padding: 40px 20px;
+    max-width: 1200px;
+    /* Set a maximum width */
+    margin: 0 auto;
+    /* Center the footer */
+    border-radius: 10px;
+    /* Add a subtle round*/
+
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+/* Newsletter Section */
+.newsletter-section {
+    grid-column: span 4;
+    background-color: #58b558;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.newsletter-heading {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.newsletter-input-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.newsletter-input {
+    padding: 10px;
+    border: none;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+
+.subscribe-button {
+    padding: 10px;
+    background-color: #fff;
+    color: #58b558;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+/* Company Info Section */
+.company-info-section {
+    grid-column: span 1;
+}
+
+.company-logo {
+    font-family: 'Cursive', sans-serif;
+    font-size: 2rem;
+    color: #fff;
+}
+
+.social-icons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    width: 100px;
+}
+
+.social-icons i {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+/* Explore Section */
+.explore-section {
+    grid-column: span 1;
+}
+
+.explore-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.explore-section li {
+    margin: 5px 0;
+    cursor: pointer;
+    color: #fff;
+}
+
+/* Contact Section */
+.contact-section {
+    grid-column: span 1;
+}
+
+.contact-section p {
+    margin: 5px 0;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    margin-top: 20px;
+    border-top: 1px solid #fff;
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-links {
+    display: flex;
+    gap: 10px;
+}
+
+.footer-links a {
+    color: #fff;
+    text-decoration: none;
+}
+@media (max-width: 200px) {
+    .footer {
+        padding: 20px 10px;
+        max-width: 100%;
+        border-radius: 5px;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        padding: 10px;
+    }
+
+    .newsletter-heading {
+        font-size: 1.2rem;
+    }
+
+    .newsletter-input-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .newsletter-input,
+    .subscribe-button {
+        width: 100%;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+
+    /* Company Info Section */
+    .company-logo {
+        font-size: 1.2rem; /* Decreased font size to ensure it fits */
+        word-wrap: break-word; /* Break text if the logo text is long */
+        text-align: center; /* Center the logo */
+        white-space: nowrap; /* Prevents logo text from breaking onto a new line */
+        overflow: hidden; /* Ensures long text doesn't overflow */
+        text-overflow: ellipsis; /* Shows ellipsis if the text is too long */
+    }
+
+    .social-icons {
+        width: 80px;
+        justify-content: space-around;
+    }
+
+    /* Explore Section */
+    .explore-section li {
+        font-size: 0.9rem;
+    }
+
+    /* Contact Section */
+    .contact-section p {
+        font-size: 0.9rem;
+    }
+
+    /* Footer Bottom */
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
