@@ -15,6 +15,7 @@ import ResetPassword from './section/ResetPassword';
 import Signin from './section/Signin';
 import Welcome from './section/Welcome';
 import Post from './section/Post';
+import BuyNow from './section/BuyNow';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/farmersign" element={<FarmerSign />} />
           <Route path="/farmerlogin" element={<Farmerlogin />} />
           <Route path="/search" element={<AllProduct  />} />
+          <Route path="/buynow" element={<BuyNow />} />
           <Route path="/posts" element={<Post />} />
           
         </Routes>

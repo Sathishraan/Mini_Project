@@ -1,21 +1,65 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { FaBars, FaSearch, FaShoppingCart, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import SearchResultsDropdown from './SearchResultsDropdown'; // Import child component
 
 const CustomerNavbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false); // Manage dropdown visibility
+
     const navigate = useNavigate();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
 
-    const goToCart = () => {
-        navigate('/cart');
+    // Handle search form submission
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        if (!searchQuery.trim()) return;
+
+        setIsDropdownVisible(true); // Show dropdown when search starts
+
+        try {
+            const response = await axios.get(`http://localhost:7007/auth/searchuser?query=${searchQuery}`);
+            setSearchResults(response.data);
+        } catch (error) {
+            console.error('Search error:', error.message);
+            if (error.response && error.response.status === 404) {
+                alert('User not found.');
+            } else {
+                alert('An error occurred. Please try again.');
+            }
+            setSearchResults([]);
+        }
     };
 
-    const goToSearch = () => {
-        navigate('/search');
+    // Handle user connection
+    const handleConnect = async (user) => {
+        try {
+            await axios.post('http://localhost:7007/auth/connect', {
+                userId: 'currentUserId', // Replace with actual logged-in user ID
+                connectedUserId: user._id,
+            });
+            alert(`Connected to ${user.username}`);
+        } catch (error) {
+            console.error('Connection error:', error.message);
+        }
+    };
+
+    // Handle closing the dropdown
+    const handleCloseDropdown = () => {
+        setIsDropdownVisible(false); // Hide the dropdown when closed
+    };
+
+    // Handle search icon click
+    const handleSearchIconClick = () => {
+        setSearchQuery(''); // Reset the search query
+        setSearchResults([]); // Clear the search results
+        setIsDropdownVisible(false); // Hide the dropdown when search icon is clicked
     };
 
     return (
@@ -25,20 +69,34 @@ const CustomerNavbar = () => {
                     AGRI TECH
                 </h3>
 
+                {/* Search Bar */}
+                <form onSubmit={handleSearch} className="relative">
+                    <input
+                        type="text"
+                        placeholder="Search users..."
+                        className="p-2  border px-7 rounded-xl bg-white text-black focus:outline-none"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <FaSearch
+                        onClick={handleSearchIconClick} // Reset state when search icon is clicked
+                        className="absolute right-2 top-3 bg-white cursor-pointer text-black"
+                    />
+                </form>
+
                 {/* Navigation Links */}
                 <ul className="hidden md:flex md:pl-36 gap-14">
                     <li>
-                        <a href="/shop" className="text-lg font-montserrat">Shop</a>
+                        <a href="/search" className="text-lg font-montserrat">Shop</a>
                     </li>
                     <li>
-                        <a href="/about" className="text-lg font-montserrat">About</a>
+                        <a href="#footer" className="text-lg font-montserrat">About</a>
                     </li>
                 </ul>
 
                 {/* Icons Section */}
                 <div className="mt-1 cursor-pointer md:pr-16 flex space-x-9 text-xl">
-                    <FaSearch onClick={goToSearch} className="cursor-pointer" />
-                    <FaShoppingCart onClick={goToCart} className="cursor-pointer" />
+                    <FaShoppingCart onClick={() => navigate('/cart')} className="cursor-pointer" />
                 </div>
 
                 {/* Mobile Menu Toggle */}
@@ -47,16 +105,15 @@ const CustomerNavbar = () => {
                 </div>
             </div>
 
-            {/* Mobile Menu */}
-            {isOpen && (
-                <ul className="md:hidden absolute top-16 right-10 text-black rounded-lg shadow-lg h-auto p-5 flex flex-col z-50 items-end space-y-3 w-11/12">
-                    <li>
-                        <a href="/shop" className="text-lg font-montserrat">Shop</a>
-                    </li>
-                    <li>
-                        <a href="/about" className="text-lg font-montserrat">About</a>
-                    </li>
-                </ul>
+            {/* Search Results Dropdown */}
+            {isDropdownVisible && searchResults.length > 0 && (
+                <div className="pl-96">
+                    <SearchResultsDropdown
+                        searchResults={searchResults}
+                        onConnect={handleConnect}
+                        onClose={handleCloseDropdown}  // Pass handleCloseDropdown to close the dropdown
+                    />
+                </div>
             )}
         </nav>
     );

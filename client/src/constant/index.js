@@ -1,10 +1,10 @@
 import { fruit1, fruit2, fruit3, fruit4} from "../assets/image";
 
 export const navLinks = [
-    { href: "#shop", label: "Shop" },
-    { href: "#browse", label: "browse" },
-    { href: "#faq", label: "FAQ" },
-    { href: "#contact", label: "Contact" },
+    { href: "/search", label: "Shop" },
+    { href: "#footer", label: "browse" },
+    
+    { href: "#footer", label: "Contact" },
 
 
 ];

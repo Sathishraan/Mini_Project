@@ -59,10 +59,10 @@ const Product = () => {
                             </div>
                             <div className="mt-4 flex justify-between space-x-2">
                                 <button
-                                    className="flex items-center justify-center bg-green-500 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-green-600 transition-colors"
+                                    className="flex items-center justify-center bg-green-500 text-white md:py-0 sm:px-4  sm:py-2 rounded-md hover:bg-green-600 transition-colors"
                                     onClick={() => addToCart(product)}
                                 >
-                                    <FontAwesomeIcon icon={faShoppingCart} className="mr-1 sm:mr-2" /> Add to Cart
+                                    <FontAwesomeIcon icon={faShoppingCart} className="mr-1  sm:mr-2" /> Add to Cart
                                 </button>
                                 <button
                                     className="bg-blue-500 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-blue-600 transition-colors"
@@ -78,7 +78,7 @@ const Product = () => {
             {message && (
                 <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-md shadow-md transition-all">
                     <p>{message}</p>
-                    <button onClick={goToCart} className="mt-2 bg-blue-500 hover:bg-blue-700 px-4 py-1 rounded-md">
+                    <button onClick={goToCart} className="mt-2  bg-blue-500 hover:bg-blue-700 px-4 py-1 rounded-md">
                         Go to Cart
                     </button>
                 </div>

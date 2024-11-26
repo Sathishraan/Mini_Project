@@ -64,6 +64,7 @@
     text-align: center;
     max-height: 400px;
     overflow-x: auto;
+    padding-left: 100px;
     /* Allow horizontal scrolling */
     white-space: nowrap;
     scrollbar-width: none;
@@ -79,7 +80,7 @@
 
 .recommended-grid {
     display: inline-flex;
-    gap: 20px;
+    gap: 30px;
     white-space: nowrap;
 }
 

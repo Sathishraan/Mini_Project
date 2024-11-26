@@ -7,8 +7,11 @@ const Post = () => {
     const [newPost, setNewPost] = useState({
         caption: '',
         file: null,
-        price: '', // Add price field
+        price: '',
+        location: '', // Added location field
     });
+    const [fileUrls, setFileUrls] = useState({}); // To store fetched file URLs
+    axios.defaults.withCredentials = true; 
 
     // Fetch posts when the component mounts
     useEffect(() => {
@@ -17,11 +20,30 @@ const Post = () => {
 
     const fetchPosts = async () => {
         try {
-            const response = await axios.get('http://localhost:7007/auth/post'); 
+            const response = await axios.get('http://localhost:7007/auth/post');
             setPosts(response.data);
+            console.log(response.data);
+            
+            // Fetch files for all posts after they are fetched
+            fetchFileUrls(response.data);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
+    };
+
+    // Fetch file URLs for each post
+    const fetchFileUrls = async (posts) => {
+        const newFileUrls = {};
+        for (const post of posts) {
+            try {
+                const response = await axios.get(`http://localhost:7007${post.fileUrl}`, { responseType: 'blob' });
+                const url = URL.createObjectURL(response.data); // Create a URL for the file
+                newFileUrls[post._id] = url; // Store the URL for the specific post
+            } catch (error) {
+                console.error('Error fetching file for post:', post._id, error);
+            }
+        }
+        setFileUrls(newFileUrls); // Set all file URLs after they are fetched
     };
 
     const handleInputChange = (e) => {
@@ -36,8 +58,8 @@ const Post = () => {
     const handlePostSubmit = async (e) => {
         e.preventDefault();
 
-        if (!newPost.caption || !newPost.file || !newPost.price) {
-            console.error('Caption, file, or price is missing');
+        if (!newPost.caption || !newPost.file || !newPost.price || !newPost.location) {
+            console.error('Caption, file, price, or location is missing');
             return;
         }
 
@@ -45,6 +67,7 @@ const Post = () => {
         formData.append('caption', newPost.caption);
         formData.append('file', newPost.file);
         formData.append('price', newPost.price);
+        formData.append('location', newPost.location);
 
         try {
             await axios.post('http://localhost:7007/auth/post', formData, {
@@ -53,7 +76,7 @@ const Post = () => {
                 },
             });
 
-            setNewPost({ caption: '', file: null, price: '' });
+            setNewPost({ caption: '', file: null, price: '', location: '' });
             fetchPosts();
         } catch (error) {
             console.error('Error adding post:', error);
@@ -62,7 +85,7 @@ const Post = () => {
 
     const handleDeletePost = async (postId) => {
         try {
-            await axios.delete(`http://localhost:7007/auth/post/${postId}`); // Changed to http
+            await axios.delete(`http://localhost:7007/auth/post/${postId}`);
             fetchPosts();
         } catch (error) {
             console.error('Error deleting post:', error);
@@ -70,7 +93,7 @@ const Post = () => {
     };
 
     return (
-        <div className="post-container  p-4">
+        <div className="post-container p-4">
             <h2 className="text-2xl font-bold mb-4">Create a New Post</h2>
 
             {/* New Post Form */}
@@ -98,6 +121,17 @@ const Post = () => {
                 </div>
                 <div className="mb-4">
                     <input
+                        type="text"
+                        name="location"
+                        value={newPost.location}
+                        onChange={handleInputChange}
+                        placeholder="Enter location"
+                        className="w-full p-2 border border-gray-300 rounded"
+                        required
+                    />
+                </div>
+                <div className="mb-4">
+                    <input
                         type="file"
                         accept="image/*,video/*"
                         onChange={handleFileChange}
@@ -117,19 +151,25 @@ const Post = () => {
                         <div key={post._id} className="post-item border-b border-gray-300 py-4">
                             <p className="text-lg font-semibold">{post.caption}</p>
                             <p className="text-gray-600">${post.price}</p>
-                            {post.fileType.startsWith('image') ? (
-                                <img
-                                    src={`http://localhost:7007${post.fileUrl}`} // Changed to http
-                                    alt="Post content"
-                                    className="mt-2 max-w-full h-auto"
-                                />
+                            <p className="text-gray-600">📍 {post.location}</p>
+                            {fileUrls[post._id] ? (
+                                post.fileType.startsWith('image') ? (
+                                    <img
+                                        src={`http://localhost:7007${post.fileUrl}`}
+                                        alt="Post content"
+                                        className="mt-2 max-w-full h-auto"
+                                    />
+                                ) : (
+                                    <video
+                                        src={fileUrls[post._id]}
+                                        controls
+                                        className="mt-2 max-w-full h-auto"
+                                    ></video>
+                                )
                             ) : (
-                                <video
-                                    src={`http://localhost:7007${post.fileUrl}`} // Changed to http
-                                    controls
-                                    className="mt-2 max-w-full h-auto"
-                                ></video>
+                                <p>Loading file...</p>
                             )}
+
                             <button
                                 onClick={() => handleDeletePost(post._id)}
                                 className="mt-2 text-red-600 flex items-center"

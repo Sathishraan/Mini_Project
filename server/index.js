@@ -8,8 +8,14 @@ import helmet from 'helmet';
 import http from 'http';
 import mongoose from 'mongoose';
 import { Server } from 'socket.io';
+import path from 'path';
 import twilio from 'twilio';
-import postRouter, { Addressrouter, Fuserrouter, Userrouter } from './router/user.js'; // Ensure this file contains routes for posts
+import postRouter, { Addressrouter, Fuserrouter, Userrouter } from './router/user.js';
+import { fileURLToPath } from 'url';
+
+// Define __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -19,14 +25,44 @@ const app = express();
 
 // Middleware configuration
 app.use(helmet({
-  contentSecurityPolicy: false, // Disable CSP for development; remove in production
+  contentSecurityPolicy: false, // Disable CSP for development; enable in production
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow cross-origin resource sharing
 }));
+
+// CORS configuration for API routes
 app.use(cors({
-  origin: 'http://localhost:5173', // Update this for your frontend URL in production
+  origin: (origin, callback) => {
+    // Always allow requests regardless of origin
+    callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true, // Enable cookies and auth headers
+  credentials: true,
 }));
+
+// Custom middleware for handling image requests in uploads folder
+app.use('/uploads', (req, res, next) => {
+  // Allow all origins for image requests
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  // Handle OPTIONS requests explicitly
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+}, express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res) => {
+    // Ensure proper headers for static files
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
+
+// Standard middleware
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.json());
@@ -44,19 +80,19 @@ const connectDB = async () => {
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
-    console.log(error);
     process.exit(1);
   }
 };
 
 connectDB();
+
 // Create HTTP server
 const server = http.createServer(app);
 
 // Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173', // Update this to match your frontend URL
+    origin: 'http://localhost:5173', // Ensure this matches your frontend URL
     methods: ['GET', 'POST'],
     credentials: true,
   },

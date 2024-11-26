@@ -4,22 +4,24 @@ import { fruits, nuts, vegetables } from '../assets/product/index.js';
 
 const AllProduct = () => {
     const [filteredItems, setFilteredItems] = useState([]);
-    const [posts, setPosts] = useState([]); // State to hold posts
-    const [title, setTitle] = useState('All Products'); // State for the title
+    const [posts, setPosts] = useState([]);
+    const [title, setTitle] = useState('All Products');
 
-    // Fetch posts from the backend
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const response = await axios.get('http://localhost:7007/auth/post');
                 const postProducts = response.data.map((post) => ({
+                    id: post._id, // Unique ID from backend
                     name: post.caption,
                     price: post.price,
-                    url: `http://localhost:7007/${post.fileUrl}`, // Adjust path as needed
-                    location: 'Farmer Post', // Static location for posts
+                    url: post.fileUrl.startsWith('http') 
+                    ? post.fileUrl // If fileUrl is already complete
+                    : `http://localhost:7007${post.fileUrl}`, // Construct complete URL
+                location: post.location || 'Farmer Post', // Fallback if location
                 }));
                 setPosts(postProducts);
-                setFilteredItems([...fruits, ...vegetables, ...nuts, ...postProducts]); // Combine all products
+                setFilteredItems([...fruits, ...vegetables, ...nuts, ...postProducts]);
             } catch (error) {
                 console.error('Error fetching posts:', error);
             }
@@ -46,12 +48,23 @@ const AllProduct = () => {
         }
     };
 
+    const addToCart = (item) => {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const updatedCart = [
+            ...cart,
+            {
+                ...item,
+                id: `${item.name}-${cart.length}`, // Unique ID for each item
+                imageUrl: item.url, // Map the `url` property to `imageUrl`
+            },
+        ];
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        alert(`${item.name} has been added to your cart!`);
+    };
+
     return (
         <div className="p-6">
-            {/* Filter Title */}
             <h2 className="text-2xl font-bold text-center mb-4">{title}</h2>
-
-            {/* Filter Buttons */}
             <div className="flex justify-center space-x-4 mb-8">
                 <button onClick={() => handleFilter('all')} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                     All Products
@@ -69,8 +82,6 @@ const AllProduct = () => {
                     Farmer Posts
                 </button>
             </div>
-
-            {/* Items Display */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16">
                 {filteredItems.map((item, index) => (
                     <div key={index} className="border rounded-lg p-4 flex flex-col items-center text-center shadow-lg">
@@ -78,6 +89,14 @@ const AllProduct = () => {
                         <h3 className="text-xl font-semibold">{item.name}</h3>
                         <p className="text-black">Price: ₹{item.price}</p>
                         <p className="text-black">Location: {item.location}</p>
+                        <div className="pt-5">
+                            <button
+                                className="border-2 rounded-lg p-3 text-white bg-gray-600 hover:bg-black"
+                                onClick={() => addToCart({ ...item, id: `${item.name}-${index}` })}
+                            >
+                                Add to Cart
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>

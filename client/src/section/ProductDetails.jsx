@@ -27,11 +27,9 @@ const ProductDetails = () => {
 
     // Handle the "Buy Now" button click
     const handleBuyNow = () => {
-        if (isAuthenticated) {
-            navigate('/address');
-        } else {
-            navigate('/login', { state: { from: `/product/${id}` } }); // Redirect to login, passing current URL
-        }
+
+        navigate('/address');
+
     };
 
     // Filter out the current product to get recommended products

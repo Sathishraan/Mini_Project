@@ -90,16 +90,14 @@ const CustomerHome = () => {
                     {fruit.map((item, index) => (
                         <div
                             key={index}
-                            className="p-4 border-2 border-gray-300 rounded-lg shadow-md cursor-pointer hover:bg-green-300 relative"
+                            className="p-4 border-2 border-gray-300 rounded-lg shadow-md cursor-pointer  relative"
                         >
                             <img
                                 src={item.image}
                                 alt={item.name}
                                 className="w-full h-auto md:w-[330px] md:h-[300px] rounded-3xl max-sm:w-[220px] max-sm:h-[220px] object-cover"
                             />
-                            <div className="absolute bottom-0 left-0 right-0 p-4 text-center bg-opacity-0 bg-black text-white rounded-b-3xl">
-                                <button className='bg-yellow-300 p-3 rounded-xl  hover:bg-yellow-600' onClick={toggleclick}>Buy Now</button>
-                            </div>
+                            
                         </div>
                     ))}
                 </div>

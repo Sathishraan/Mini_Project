@@ -42,34 +42,40 @@ Userrouter.post('/signup', async (req, res) => {
     }
 });
 
+
 Fuserrouter.post('/farmersign', async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, phone } = req.body; // Add phone to destructure
         console.log('Signup request body:', req.body);
 
+        // Check if email already exists
         const existingUser = await Fuser.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Create a new user with the phone field
         const newUser = new Fuser({
             username,
             email,
             password: hashedPassword,
+            phone, // Save the phone number
         });
 
         await newUser.save();
         return res.status(201).json({
             status: true,
-            message: 'User created successfully'
+            message: 'User created successfully',
         });
     } catch (error) {
         console.error('Signup error:', error);
         return res.status(500).json({ message: 'An error occurred during registration', error: error.message });
     }
 });
+
 // Login route
 Userrouter.post('/login', async (req, res) => {
     try {
@@ -172,6 +178,7 @@ Userrouter.post('/forgotpassword', async (req, res) => {
         if (!user) {
             return res.status(404).json({ status: false, message: "User not registered" });
         }
+        console.log(user);
 
         let transporter = nodemailer.createTransport({
             host: 'smtp-relay.brevo.com',
@@ -227,6 +234,44 @@ Userrouter.post('/resetPassword/:token', async (req, res) => {
     }
 });
 
+// Search for users
+Userrouter.get('/searchuser', async (req, res) => {
+    const { query } = req.query;
+
+    try {
+        // Find users whose username matches the query and include phone in the result
+        const users = await Fuser.find(
+            { username: { $regex: query, $options: 'i' } }, // Case-insensitive search
+            { username: 1, phone: 1, _id: 1 } // Select only the fields needed
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+
+        res.status(200).json(users); // Send users with phone numbers
+    } catch (error) {
+        console.error('Search error:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+Userrouter.post('/connect', async (req, res) => {
+    const { userId, connectedUserId } = req.body;
+
+    try {
+        // Logic to update user connections in the database
+        await Fuser.findByIdAndUpdate(userId, {
+            $addToSet: { connections: connectedUserId },
+        });
+
+        res.status(200).json({ message: 'Connection successful' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to connect', error: error.message });
+    }
+});
+
+
 // Address route
 Addressrouter.post('/address', async (req, res) => {
     const { street, city, zip } = req.body;
@@ -259,50 +304,23 @@ export { Addressrouter, Fuserrouter, Userrouter };
 
 //post router
 
-
-
-
-
-
-
-
-
-import mongoose from 'mongoose';
 import multer from 'multer';
-import { GridFsStorage } from 'multer-gridfs-storage';
-
+import fs from 'fs';
+import path from 'path';
 import Post from '../Models/Posts.js';
 
 const router = express.Router();
 
-
-const mongoURI = 'mongodb+srv://sathishraana0701:WyyW2uImlU2MNB55@cluster0.7ajazsu.mongodb.net/Mini_Project';
-
-// Create a connection
-const conn = mongoose.createConnection(mongoURI);
-
-let gfs;
-
-conn.once('open', () => {
-    gfs = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: 'uploads' });
-
-    gfs.on('file', (f) => {
-        if (!f || !f._id) {
-            console.error('File upload error: File object is undefined or missing _id');
-        }
-    });
-});
-
-
-// Multer GridFS Storage
-const storage = new GridFsStorage({
-    url: mongoURI,
-    file: (req, file) => {
-        console.log('File being processed:', file);
-        return {
-            bucketName: 'uploads',
-            filename: `${Date.now()}-${file.originalname}`,
-        };
+// Multer configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = path.join('uploads');
+        if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath);
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        const uniqueName = `${Date.now()}-${file.originalname}`;
+        cb(null, uniqueName);
     },
 });
 
@@ -316,24 +334,24 @@ const upload = multer({
     },
 });
 
-export { conn, gfs, upload };
-
-
-
 // Create a new post
+// Add the location field to the create post route
 router.post('/post', upload.single('file'), async (req, res) => {
     try {
-        const { caption, price } = req.body;
+        const { caption, price, location } = req.body;
 
         if (!req.file) return res.status(400).json({ message: 'File is required' });
-        if (!caption || !price) return res.status(400).json({ message: 'Caption and price are required' });
+        if (!caption || !price || !location) return res.status(400).json({ message: 'Caption, price, and location are required' });
 
+        const baseUrl = req.protocol + '://' + req.get('host'); // e.g., "http://localhost:7007"
         const post = new Post({
             caption,
             price,
-            fileId: req.file.id, // Reference to the GridFS file
+            location,
+            fileUrl: `${baseUrl}/uploads/${req.file.filename}`, // Full URL
             fileType: req.file.mimetype,
         });
+
 
         await post.save();
         res.status(201).json({ message: 'Post created successfully', post });
@@ -344,15 +362,10 @@ router.post('/post', upload.single('file'), async (req, res) => {
 });
 
 
+// Get all posts
 router.get('/post', async (req, res) => {
-    console.log("Fetching all posts...");
     try {
         const posts = await Post.find().sort({ createdAt: -1 });
-
-        if (posts.length === 0) {
-            return res.status(404).json({ message: 'No posts found' });
-        }
-
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error.message);
@@ -360,54 +373,14 @@ router.get('/post', async (req, res) => {
     }
 });
 
-
-
-
-// Serve file from GridFS
-router.get('/post/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        // Validate if `id` is a valid ObjectId
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid file ID' });
-        }
-
-        const fileId = new mongoose.Types.ObjectId(id);
-
-        // Create a GridFSBucket instance
-        const gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-            bucketName: 'uploads', // Make sure this matches your bucket name
-        });
-
-        const downloadStream = gfs.openDownloadStream(fileId);
-
-        // Pipe the file to the response
-        downloadStream.on('error', (err) => {
-            console.error('Stream error:', err.message);
-            res.status(404).json({ message: 'File not found' });
-        });
-
-        res.set('Content-Type', 'application/octet-stream'); // Set the default content type
-        downloadStream.pipe(res);
-    } catch (error) {
-        console.error('Error fetching file:', error.message);
-        res.status(500).json({ message: 'Failed to fetch file' });
-    }
-});
-
-
 // Delete a post
 router.delete('/post/:id', async (req, res) => {
     try {
         const post = await Post.findByIdAndDelete(req.params.id);
         if (!post) return res.status(404).json({ message: 'Post not found' });
 
-        // Remove file from GridFS
-        const fileId = new mongoose.Types.ObjectId(post.fileId);
-        gfs.delete(fileId, (err) => {
-            if (err) return res.status(500).json({ message: 'Failed to delete file' });
-        });
+        const filePath = path.join('uploads', path.basename(post.fileUrl));
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 
         res.status(200).json({ message: 'Post deleted successfully' });
     } catch (error) {
