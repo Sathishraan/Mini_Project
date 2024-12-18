@@ -35,14 +35,15 @@ const Cart = () => {
     };
 
     // Handle "Buy All" button click
+    // Inside handleBuyAll function
     const handleBuyAll = () => {
-        console.log('Buy All button clicked'); // Debugging log
+        const totalAmount = calculateTotal(); // Get the total amount
         setCart([]); // Clear the cart state
         localStorage.removeItem('cart'); // Remove cart from localStorage
-        console.log('Cart cleared and localStorage updated'); // Debugging log
-        navigate('/address'); // Redirect to address page
+        navigate('/address', { state: { amount: totalAmount } }); // Pass total amount to Address
     };
-    
+
+
     // Handle "Back to Home" button click
     const backToHome = () => {
         navigate('/customerhome');
@@ -80,7 +81,7 @@ const Cart = () => {
                                         </h3>
                                     </div>
                                     <div className="text-base md:text-lg font-medium md:pr-10 bg-white text-green-600 ml-0 md:ml-auto">
-                                        ${parseFloat(item.price).toFixed(2)}
+                                        ₹{parseFloat(item.price).toFixed(2)}
                                     </div>
                                     <div className="flex space-x-2 bg-white mt-3 md:mt-0">
                                         <button
@@ -100,7 +101,7 @@ const Cart = () => {
                             ))}
                         </ul>
                         <div className="mt-5 p-4 bg-white rounded-lg shadow-md text-center">
-                            <h2 className="text-xl md:text-2xl font-bold mb-3">Total: ${calculateTotal().toFixed(2)}</h2>
+                            <h2 className="text-xl md:text-2xl font-bold mb-3">Total: ₹{calculateTotal().toFixed(2)}</h2>
                             <button
                                 className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 text-sm md:text-base"
                                 onClick={handleBuyAll}

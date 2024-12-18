@@ -304,10 +304,10 @@ export { Addressrouter, Fuserrouter, Userrouter };
 
 //post router
 
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
-import Post from '../Models/Posts.js';
+    import fs from 'fs';
+    import multer from 'multer';
+    import path from 'path';
+    import Post from '../Models/Posts.js';
 
 const router = express.Router();
 
@@ -338,7 +338,8 @@ const upload = multer({
 // Add the location field to the create post route
 router.post('/post', upload.single('file'), async (req, res) => {
     try {
-        const { caption, price, location } = req.body;
+        const { caption, price, location, quantity } = req.body;
+
 
         if (!req.file) return res.status(400).json({ message: 'File is required' });
         if (!caption || !price || !location) return res.status(400).json({ message: 'Caption, price, and location are required' });
@@ -348,11 +349,11 @@ router.post('/post', upload.single('file'), async (req, res) => {
             caption,
             price,
             location,
+            quantity, // Include the quantity
             fileUrl: `${baseUrl}/uploads/${req.file.filename}`, // Full URL
             fileType: req.file.mimetype,
         });
-
-
+        
         await post.save();
         res.status(201).json({ message: 'Post created successfully', post });
     } catch (error) {

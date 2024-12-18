@@ -7,14 +7,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const Product = () => {
     const products = [
-        { id: 1, name: 'TOMATO', price: '₹50.00', imageUrl: '/src/assets/image/tomato.jpg' },
-        { id: 2, name: 'BRINJAL', price: '₹35.00', imageUrl: '/src/assets/image/brinjal.jpg' },
-        { id: 3, name: 'ONION', price: '₹25.00', imageUrl: '/src/assets/image/onion.jpg' },
-        { id: 4, name: 'POTATO', price: '₹40.00', imageUrl: '/src/assets/image/potato.jpg' },
-        { id: 5, name: 'CHILLI', price: '₹30.00', imageUrl: '/src/assets/image/WhatsApp Image 2024-09-19 at 10.23.09.jpeg' },
-        { id: 6, name: 'MANGO', price: '₹28.00', imageUrl: '/src/assets/image/mango.jpeg' },
-        { id: 7, name: 'GRAPES', price: '₹22.00', imageUrl: '/src/assets/image/graps.jpeg' },
-        { id: 8, name: 'CAPSICUM', price: '₹55.00', imageUrl: '/src/assets/image/cap.jpeg' },
+        { id: 1, name: 'TOMATO', price: '50.00', imageUrl: '/src/assets/image/tomato.jpg' },
+        { id: 2, name: 'BRINJAL', price: '35.00', imageUrl: '/src/assets/image/brinjal.jpg' },
+        { id: 3, name: 'ONION', price: '25.00', imageUrl: '/src/assets/image/onion.jpg' },
+        { id: 4, name: 'POTATO', price: '40.00', imageUrl: '/src/assets/image/potato.jpg' },
+        { id: 5, name: 'CHILLI', price: '30.00', imageUrl: '/src/assets/image/WhatsApp Image 2024-09-19 at 10.23.09.jpeg' },
+        { id: 6, name: 'MANGO', price: '28.00', imageUrl: '/src/assets/image/mango.jpeg' },
+        { id: 7, name: 'GRAPES', price: '22.00', imageUrl: '/src/assets/image/graps.jpeg' },
+        { id: 8, name: 'CAPSICUM', price: '55.00', imageUrl: '/src/assets/image/cap.jpeg' },
     ];
 
     const [message, setMessage] = useState('');

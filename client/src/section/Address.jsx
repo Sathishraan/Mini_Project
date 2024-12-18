@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react'; // Correctly import as a named export
+import React, { useState } from 'react';
 import Confetti from 'react-confetti';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -19,12 +19,18 @@ const Address = () => {
     const [paymentSuccess, setPaymentSuccess] = useState(false);
 
     const upiId = 'sathishraana0701@okhdfcbank';
-    const amount = '500'; // Set a sample amount for payment
+    const amount = '0'; // Set a sample amount for payment
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
+
+    // Access the passed state in Address component
+    
+    const totalAmount = location.state?.amount || 0; // Default to 0 if amount not passed
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -147,7 +153,7 @@ const Address = () => {
                         <div className="mt-6 text-center">
                             <h3 className="text-lg font-semibold mb-2">Scan to Pay</h3>
                             <QRCodeCanvas
-                                value={`upi://pay?pa=${upiId}&pn=Sathish&mc=&tid=&tr=&tn=OrderPayment&am=${amount}&cu=INR`}
+                                value={`upi://pay?pa=${upiId}&pn=Sathish&mc=&tid=&tr=&tn=OrderPayment&am=${totalAmount}&cu=INR`}
                                 size={200}
                                 className="mx-auto"
                             />
@@ -167,7 +173,7 @@ const Address = () => {
                     <Confetti
                         width={window.innerWidth}
                         height={window.innerHeight}
-                        numberOfPieces={200}
+                        numberOfPieces={300}
                         gravity={0.3}
                     />
                     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-green-500 p-6 rounded-lg shadow-xl text-center z-50">

@@ -69,7 +69,7 @@ const CustomerNavbar = () => {
                     AGRI TECH
                 </h3>
 
-                {/* Search Bar */}
+                {/* Search Bar
                 <form onSubmit={handleSearch} className="relative">
                     <input
                         type="text"
@@ -82,7 +82,7 @@ const CustomerNavbar = () => {
                         onClick={handleSearchIconClick} // Reset state when search icon is clicked
                         className="absolute right-2 top-3 bg-white cursor-pointer text-black"
                     />
-                </form>
+                </form> */}
 
                 {/* Navigation Links */}
                 <ul className="hidden md:flex md:pl-36 gap-14">

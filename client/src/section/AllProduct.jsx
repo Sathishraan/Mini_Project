@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { fruits, nuts, vegetables } from '../assets/product/index.js';
 
 const AllProduct = () => {
@@ -12,16 +12,24 @@ const AllProduct = () => {
             try {
                 const response = await axios.get('http://localhost:7007/auth/post');
                 const postProducts = response.data.map((post) => ({
-                    id: post._id, // Unique ID from backend
+                    id: post._id,
                     name: post.caption,
                     price: post.price,
-                    url: post.fileUrl.startsWith('http') 
-                    ? post.fileUrl // If fileUrl is already complete
-                    : `http://localhost:7007${post.fileUrl}`, // Construct complete URL
-                location: post.location || 'Farmer Post', // Fallback if location
+                    url: post.fileUrl.startsWith('http')
+                        ? post.fileUrl
+                        : `http://localhost:7007${post.fileUrl}`,
+                    location: post.location || 'Farmer Post',
+                    quantity: post.quantity, // Add quantity field
                 }));
                 setPosts(postProducts);
-                setFilteredItems([...fruits, ...vegetables, ...nuts, ...postProducts]);
+
+                // Combine the products (from fruits, vegetables, nuts, and fetched posts)
+                const allProducts = [...fruits, ...vegetables, ...nuts, ...postProducts];
+                setFilteredItems(allProducts);
+                
+                // Retrieve and update the filteredItems from localStorage on page load
+                const storedItems = JSON.parse(localStorage.getItem('filteredItems')) || allProducts;
+                setFilteredItems(storedItems);
             } catch (error) {
                 console.error('Error fetching posts:', error);
             }
@@ -30,35 +38,53 @@ const AllProduct = () => {
     }, []);
 
     const handleFilter = (category) => {
-        if (category === 'fruits') {
-            setFilteredItems(fruits);
-            setTitle('Fruits');
-        } else if (category === 'vegetables') {
-            setFilteredItems(vegetables);
-            setTitle('Vegetables');
-        } else if (category === 'nuts') {
-            setFilteredItems(nuts);
-            setTitle('Nuts');
-        } else if (category === 'posts') {
-            setFilteredItems(posts);
-            setTitle('Farmer Posts');
-        } else {
-            setFilteredItems([...fruits, ...vegetables, ...nuts, ...posts]);
-            setTitle('All Products');
-        }
+        let updatedItems = [];
+        if (category === 'fruits') updatedItems = fruits;
+        else if (category === 'vegetables') updatedItems = vegetables;
+        else if (category === 'nuts') updatedItems = nuts;
+        else if (category === 'posts') updatedItems = posts;
+        else updatedItems = [...fruits, ...vegetables, ...nuts, ...posts];
+
+        // Update the filteredItems based on current product availability
+        const updatedItemsWithAvailability = updatedItems.map((item) => ({
+            ...item,
+            isOutOfStock: item.quantity === 0,
+        }));
+
+        setFilteredItems(updatedItemsWithAvailability);
+        localStorage.setItem('filteredItems', JSON.stringify(updatedItemsWithAvailability));  // Persist to localStorage
     };
 
     const addToCart = (item) => {
+        if (item.quantity <= 0) {
+            alert('This item is out of stock.');
+            return;
+        }
+
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         const updatedCart = [
             ...cart,
             {
                 ...item,
-                id: `${item.name}-${cart.length}`, // Unique ID for each item
-                imageUrl: item.url, // Map the `url` property to `imageUrl`
+                id: `${item.name}-${cart.length}`,
+                imageUrl: item.url,
             },
         ];
+
+        // Reduce the quantity in filteredItems
+        const updatedItems = filteredItems.map((product) =>
+            product.id === item.id ? { ...product, quantity: product.quantity - 1 } : product
+        );
+
+        setFilteredItems(updatedItems);
+        setPosts(posts.map((post) =>
+            post.id === item.id ? { ...post, quantity: post.quantity - 1 } : post
+        ));
+
+        // Save the updated filteredItems and cart to localStorage
         localStorage.setItem('cart', JSON.stringify(updatedCart));
+        localStorage.setItem('filteredItems', JSON.stringify(updatedItems));  // Persist the updated items
+        
         alert(`${item.name} has been added to your cart!`);
     };
 
@@ -84,19 +110,28 @@ const AllProduct = () => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16">
                 {filteredItems.map((item, index) => (
-                    <div key={index} className="border rounded-lg p-4 flex flex-col items-center text-center shadow-lg">
-                        <img src={item.url} alt={item.name} className="h-32 w-32 object-cover mb-4 rounded" />
-                        <h3 className="text-xl font-semibold">{item.name}</h3>
-                        <p className="text-black">Price: ₹{item.price}</p>
-                        <p className="text-black">Location: {item.location}</p>
-                        <div className="pt-5">
-                            <button
-                                className="border-2 rounded-lg p-3 text-white bg-gray-600 hover:bg-black"
-                                onClick={() => addToCart({ ...item, id: `${item.name}-${index}` })}
-                            >
-                                Add to Cart
-                            </button>
-                        </div>
+                    <div
+                        key={index}
+                        className={`border rounded-lg p-4 flex flex-col items-center text-center shadow-lg ${item.quantity === 0 ? 'opacity-50' : ''
+                            }`}
+                    >
+                        <img
+                            src={item.url || item.image}
+                            alt={item.name}
+                            className={`w-32 h-32 object-cover mb-4 ${item.quantity === 0 ? 'filter blur-md' : ''}`}
+                        />
+                        <h3 className="text-lg font-bold mb-2">{item.name}</h3>
+                        <p className="text-sm mb-2">Price: ₹{item.price}</p>
+                        <p className="text-sm mb-2">{item.location}</p>
+                        <p className="text-sm mb-2">Quantity: {item.quantity > 0 ? `${item.quantity} kg` : 'Out of Stock'}</p>
+                        <button
+                            onClick={() => addToCart(item)}
+                            className={`px-4 py-2 mt-auto rounded ${item.quantity === 0 ? 'bg-red-500 cursor-not-allowed font-semibold' : 'bg-blue-500 text-white hover:bg-blue-600'
+                                }`}
+                            disabled={item.quantity === 0}
+                        >
+                            {item.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+                        </button>
                     </div>
                 ))}
             </div>

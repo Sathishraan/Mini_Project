@@ -8,10 +8,10 @@ const Post = () => {
         caption: '',
         file: null,
         price: '',
-        location: '', // Added location field
+        location: '',
+        quantity: 1, // Default quantity
     });
-    const [fileUrls, setFileUrls] = useState({}); // To store fetched file URLs
-    axios.defaults.withCredentials = true; 
+    axios.defaults.withCredentials = true;
 
     // Fetch posts when the component mounts
     useEffect(() => {
@@ -22,28 +22,9 @@ const Post = () => {
         try {
             const response = await axios.get('http://localhost:7007/auth/post');
             setPosts(response.data);
-            console.log(response.data);
-            
-            // Fetch files for all posts after they are fetched
-            fetchFileUrls(response.data);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
-    };
-
-    // Fetch file URLs for each post
-    const fetchFileUrls = async (posts) => {
-        const newFileUrls = {};
-        for (const post of posts) {
-            try {
-                const response = await axios.get(`http://localhost:7007${post.fileUrl}`, { responseType: 'blob' });
-                const url = URL.createObjectURL(response.data); // Create a URL for the file
-                newFileUrls[post._id] = url; // Store the URL for the specific post
-            } catch (error) {
-                console.error('Error fetching file for post:', post._id, error);
-            }
-        }
-        setFileUrls(newFileUrls); // Set all file URLs after they are fetched
     };
 
     const handleInputChange = (e) => {
@@ -68,6 +49,7 @@ const Post = () => {
         formData.append('file', newPost.file);
         formData.append('price', newPost.price);
         formData.append('location', newPost.location);
+        formData.append('quantity', newPost.quantity);
 
         try {
             await axios.post('http://localhost:7007/auth/post', formData, {
@@ -76,7 +58,7 @@ const Post = () => {
                 },
             });
 
-            setNewPost({ caption: '', file: null, price: '', location: '' });
+            setNewPost({ caption: '', file: null, price: '', location: '', quantity: 1 });
             fetchPosts();
         } catch (error) {
             console.error('Error adding post:', error);
@@ -96,55 +78,54 @@ const Post = () => {
         <div className="post-container p-4">
             <h2 className="text-2xl font-bold mb-4">Create a New Post</h2>
 
-            {/* New Post Form */}
             <form onSubmit={handlePostSubmit} className="mb-6">
-                <div className="mb-4">
-                    <textarea
-                        name="caption"
-                        value={newPost.caption}
-                        onChange={handleInputChange}
-                        placeholder="Write a caption..."
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <input
-                        type="number"
-                        name="price"
-                        value={newPost.price}
-                        onChange={handleInputChange}
-                        placeholder="Enter price"
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <input
-                        type="text"
-                        name="location"
-                        value={newPost.location}
-                        onChange={handleInputChange}
-                        placeholder="Enter location"
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <input
-                        type="file"
-                        accept="image/*,video/*"
-                        onChange={handleFileChange}
-                        className="border border-gray-300 rounded p-2"
-                        required
-                    />
-                </div>
+                <textarea
+                    name="caption"
+                    value={newPost.caption}
+                    onChange={handleInputChange}
+                    placeholder="Write a caption..."
+                    className="w-full p-2 border bg-white border-gray-300 rounded mb-4"
+                    required
+                />
+                <input
+                    type="number"
+                    name="price"
+                    value={newPost.price}
+                    onChange={handleInputChange}
+                    placeholder="Enter price"
+                    className="w-full p-2 border bg-white border-gray-300 rounded mb-4"
+                    required
+                />
+                <input
+                    type="text"
+                    name="location"
+                    value={newPost.location}
+                    onChange={handleInputChange}
+                    placeholder="Enter location"
+                    className="w-full p-2 border bg-white border-gray-300 rounded mb-4"
+                    required
+                />
+                <input
+                    type="number"
+                    name="quantity"
+                    value={newPost.quantity}
+                    onChange={handleInputChange}
+                    placeholder="Enter quantity (kg)"
+                    className="w-full p-2 border bg-white border-gray-300 rounded mb-4"
+                    required
+                />
+                <input
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={handleFileChange}
+                    className="border border-gray-300 bg-white rounded p-2 mb-4"
+                    required
+                />
                 <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded">
                     Add Post
                 </button>
             </form>
 
-            {/* Display Posts */}
             <div className="posts-list">
                 {posts.length > 0 ? (
                     posts.map((post) => (
@@ -152,24 +133,7 @@ const Post = () => {
                             <p className="text-lg font-semibold">{post.caption}</p>
                             <p className="text-gray-600">${post.price}</p>
                             <p className="text-gray-600">📍 {post.location}</p>
-                            {fileUrls[post._id] ? (
-                                post.fileType.startsWith('image') ? (
-                                    <img
-                                        src={`http://localhost:7007${post.fileUrl}`}
-                                        alt="Post content"
-                                        className="mt-2 max-w-full h-auto"
-                                    />
-                                ) : (
-                                    <video
-                                        src={fileUrls[post._id]}
-                                        controls
-                                        className="mt-2 max-w-full h-auto"
-                                    ></video>
-                                )
-                            ) : (
-                                <p>Loading file...</p>
-                            )}
-
+                            <p className="text-gray-600">Quantity: {post.quantity} kg</p>
                             <button
                                 onClick={() => handleDeletePost(post._id)}
                                 className="mt-2 text-red-600 flex items-center"

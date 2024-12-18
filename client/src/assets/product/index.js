@@ -31,45 +31,44 @@ import turmic from './turmic.jpeg';
 
 // Fruits category
 const fruits = [
-    { name: 'apple', url: apple, price: 120, location: 'Gandhipuram' },
-    { name: 'banana', url: banana, price: 40, location: 'Ukkadam' },
-    { name: 'blueberry', url: blueberry, price: 300, location: 'RS Puram' },
-    { name: 'blueberry1', url: blueberry1, price: 320, location: 'Peelamedu' },
-    { name: 'cherry', url: cherry, price: 200, location: 'Saibaba Colony' },
-    { name: 'grapes', url: grapes1, price: 100, location: 'Saravanampatti' },
-    { name: 'orange', url: orange, price: 90, location: 'Kuniyamuthur' },
-    { name: 'orange1', url: orange1, price: 95, location: 'Gandhipuram' },
-    { name: 'orange3', url: orange2, price: 85, location: 'Vadavalli' },
-    { name: 'pear', url: pear, price: 150, location: 'Singanallur' },
-    { name: 'strawberry', url: straberry, price: 250, location: 'RS Puram' },
-    { name: 'strawberry3', url: straberry3, price: 270, location: 'Race Course' },
+    { name: 'apple', url: apple, price: 120, location: 'Gandhipuram', quantity: 30 },
+    { name: 'banana', url: banana, price: 40, location: 'Ukkadam', quantity: 30 },
+    { name: 'blueberry', url: blueberry, price: 300, location: 'RS Puram', quantity: 30 },
+    { name: 'blueberry1', url: blueberry1, price: 320, location: 'Peelamedu', quantity: 30 },
+    { name: 'cherry', url: cherry, price: 200, location: 'Saibaba Colony', quantity: 30 },
+    { name: 'grapes', url: grapes1, price: 100, location: 'Saravanampatti', quantity: 30 },
+    { name: 'orange', url: orange, price: 90, location: 'Kuniyamuthur', quantity: 30 },
+    { name: 'orange1', url: orange1, price: 95, location: 'Gandhipuram', quantity: 30 },
+    { name: 'orange3', url: orange2, price: 85, location: 'Vadavalli', quantity: 30 },
+    { name: 'pear', url: pear, price: 150, location: 'Singanallur', quantity: 30 },
+    { name: 'strawberry', url: straberry, price: 250, location: 'RS Puram', quantity: 30 },
+    { name: 'strawberry3', url: straberry3, price: 270, location: 'Race Course', quantity: 30 },
 ];
 
 // Vegetables category
 const vegetables = [
-    { name: 'tomato', url: tomato, price: 30, location: 'Gandhipuram' },
-    { name: 'ladiesfinger', url: ladiesfinger, price: 50, location: 'Ukkadam' },
-    { name: 'carrot', url: carrot, price: 60, location: 'RS Puram' },
-    { name: 'onion', url: onion1, price: 20, location: 'Peelamedu' },
-    { name: 'ginger', url: ginger, price: 150, location: 'Saibaba Colony' },
-    { name: 'cabbage', url: cabbage, price: 25, location: 'Saravanampatti' },
-    { name: 'corn', url: corn, price: 35, location: 'Kuniyamuthur' },
-    { name: 'pea', url: pea, price: 80, location: 'Gandhipuram' },
-    { name: 'beetroot', url: beetroot, price: 40, location: 'Vadavalli' },
-    { name: 'garlic', url: garlic, price: 120, location: 'Singanallur' },
-    { name: 'mushroom', url: mushroom, price: 180, location: 'RS Puram' },
-    { name: 'pumpkin', url: pumkin, price: 45, location: 'Race Course' },
-    { name: 'turmeric', url: turmic, price: 200, location: 'Peelamedu' },
-    { name: 'cucumber', url: cucumber, price: 30, location: 'Gandhipuram' },
-    { name: 'capsicum', url: capsicum, price: 70, location: 'Saravanampatti' },
-    { name: 'beans', url: beans, price: 60, location: 'Kuniyamuthur' },
+    { name: 'tomato', url: tomato, price: 30, location: 'Gandhipuram', quantity: 30 },
+    { name: 'ladiesfinger', url: ladiesfinger, price: 50, location: 'Ukkadam', quantity: 30 },
+    { name: 'carrot', url: carrot, price: 60, location: 'RS Puram', quantity: 30 },
+    { name: 'onion', url: onion1, price: 20, location: 'Peelamedu', quantity: 30 },
+    { name: 'ginger', url: ginger, price: 150, location: 'Saibaba Colony', quantity: 30 },
+    { name: 'cabbage', url: cabbage, price: 25, location: 'Saravanampatti', quantity: 30 },
+    { name: 'corn', url: corn, price: 35, location: 'Kuniyamuthur', quantity: 30 },
+    { name: 'pea', url: pea, price: 80, location: 'Gandhipuram', quantity: 30 },
+    { name: 'beetroot', url: beetroot, price: 40, location: 'Vadavalli', quantity: 30 },
+    { name: 'garlic', url: garlic, price: 120, location: 'Singanallur', quantity: 30 },
+    { name: 'mushroom', url: mushroom, price: 180, location: 'RS Puram', quantity: 30 },
+    { name: 'pumpkin', url: pumkin, price: 45, location: 'Race Course', quantity: 30 },
+    { name: 'turmeric', url: turmic, price: 200, location: 'Peelamedu', quantity: 30 },
+    { name: 'cucumber', url: cucumber, price: 30, location: 'Gandhipuram', quantity: 30 },
+    { name: 'capsicum', url: capsicum, price: 70, location: 'Saravanampatti', quantity: 30 },
+    { name: 'beans', url: beans, price: 60, location: 'Kuniyamuthur', quantity: 30 },
 ];
 
 // Nuts category
 const nuts = [
-    { name: 'groundnut', url: groundnut, price: 90, location: 'Ukkadam' },
-    { name: 'peri', url: peri, price: 150, location: 'RS Puram' },
+    { name: 'groundnut', url: groundnut, price: 90, location: 'Ukkadam', quantity: 30 },
+    { name: 'peri', url: peri, price: 150, location: 'RS Puram', quantity: 30 },
 ];
 
 export { fruits, nuts, vegetables };
-
